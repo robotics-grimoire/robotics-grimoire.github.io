@@ -14,7 +14,13 @@ TIMEZONE = 'America/New_York'
 DEFAULT_LANG = 'en'
 
 DISPLAY_CATEGORIES_ON_MENU = False
-DISPLAY_PAGES_ON_MENU = True
+DISPLAY_PAGES_ON_MENU = False
+
+MENUITEMS = (
+    ('Blog', 'https://robotics-grimoire.github.io'),
+    ('About', '/pages/about.html'),
+    ('References', '/pages/references.html'),
+    )
 
 # Feed generation is usually not desired when developing
 FEED_ALL_ATOM = None
