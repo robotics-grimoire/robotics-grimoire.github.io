@@ -1,0 +1,6 @@
+#!/bin/bash
+
+str="'$*'"
+
+pelican content -o output -s publishconf.py
+ghp-import -m "$str" --no-jekyll -b master output
