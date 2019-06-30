@@ -7,10 +7,13 @@ SITENAME = 'The Robotics Grimoire'
 SITEURL = ''
 
 PATH = 'content'
+ARTICLE_PATH = 'articles'
 
 TIMEZONE = 'America/New_York'
 
 DEFAULT_LANG = 'en'
+
+DISPLAY_CATEGORIES_ON_MENU = False
 
 # Feed generation is usually not desired when developing
 FEED_ALL_ATOM = None
@@ -21,9 +24,8 @@ AUTHOR_FEED_RSS = None
 
 # Blogroll
 LINKS = (('Pelican', 'http://getpelican.com/'),
-         ('Python.org', 'http://python.org/'),
-         ('Jinja2', 'http://jinja.pocoo.org/'),
-         ('You can modify those links in your config file', '#'),)
+         ('GitHub', 'http://github.com/'),
+        )
 
 # Social widget
 SOCIAL = (('You can add links in your config file', '#'),
