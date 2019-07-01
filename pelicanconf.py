@@ -45,11 +45,6 @@ HEADER_COVER = 'images/Tron.jpg'
 HEADER_COLOR = 'white'
 COLOR_SCHEME_CSS = 'darkly.css'
 
-# Custom Footer
-FOOTER_INCLUDE = 'customfooter.html'
-IGNORE_FILES = [FOOTER_INCLUDE]
-EXTRA_TEMPLATES_PATHS = [os.path.dirname(__file__)]
-
 # Fixed menu items
 MENUITEMS = (
     ('About', '/pages/about.html'),
