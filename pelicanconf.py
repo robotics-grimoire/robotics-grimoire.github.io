@@ -5,10 +5,11 @@ import os
 
 addons = os.environ['HOME']+'/Projects/pelican-addons/'
 
-AUTHOR = 'robotics-grimoire'
+AUTHOR = 'John Hill'
 SITENAME = 'The Robotics Grimoire'
-SITEURL = ''
-DISQUS_SITENAME = 'robotics-grimoire.disqus.com'
+SITEURL = 'https://robotics-grimoire.github.io'
+# DISQUSURL = 'https://robotics-grimoire.github.io'
+DISQUS_SITENAME = 'robotics-grimoire'
 
 # Show us the way
 PATH = 'content'
@@ -40,7 +41,7 @@ PLUGINS = [
 ]
 
 ### THEME SETUP ###
-THEME = addons + 'pelican-themes/pelican-clean-blog' # See https://github.com/molivier/nest
+THEME = addons + 'pelican-themes/pelican-clean-blog' # See https://github.com/gilsondev/pelican-clean-blog
 HEADER_COVER = 'images/Tron.jpg'
 HEADER_COLOR = 'white'
 COLOR_SCHEME_CSS = 'darkly.css'
@@ -51,7 +52,7 @@ MENUITEMS = (
     ('Archive', '/archives.html'),
     ('Tags', '/tags.html'),
     ('Links', '/pages/links.html'),
-    ('Reference', '/pages/references.html'),
+    ('References', '/pages/references.html'),
 )
 
 # Dynamic menu items
@@ -72,6 +73,3 @@ SOCIAL = (
 )
 
 DEFAULT_PAGINATION = 10
-
-# Uncomment following line if you want document-relative URLs when developing
-#RELATIVE_URLS = True
