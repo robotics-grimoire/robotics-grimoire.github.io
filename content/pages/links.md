@@ -1,14 +1,11 @@
-Title: References
+Title: Links
 Date: 2019-06-30
 
-Useful References & Resources
-========================================================================================================================
-
-### Index
-
-* [Programming](#programming)
-* [Tools](#tools)
-* [Resources](#resources)
+| Index                       |
+|-----------------------------|
+| [Programming](#programming) |
+| [Tools](#tools)             |
+| [Resources](#resources)     |
 
 
 

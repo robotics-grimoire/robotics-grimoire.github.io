@@ -8,6 +8,7 @@ addons = os.environ['HOME']+'/Projects/pelican-addons/'
 AUTHOR = 'robotics-grimoire'
 SITENAME = 'The Robotics Grimoire'
 SITEURL = ''
+DISQUS_SITENAME = 'robotics-grimoire.disqus.com'
 
 # Show us the way
 PATH = 'content'
@@ -38,26 +39,24 @@ PLUGINS = [
     'ipynb.markup',
 ]
 
-# Themes
-# THEME = 'attila'
-HOME_COVER = 'images/Tron.jpg'
-AUTHORS_BIO = {
-  'John': {
-    'name': 'John Hill',
-    'image': 'images/Light.jpg',
-    'linkedin': 'https://www.linkedin.com/in/jhill515',
-    'stackoverflow': 'https://stackoverflow.com/users/story/2370362',
-    'location': 'Pittsburgh',
-    'bio': 'Keep on creating!',
-  }
-}
+### THEME SETUP ###
+THEME = addons + 'pelican-themes/pelican-clean-blog' # See https://github.com/molivier/nest
+HEADER_COVER = 'images/Tron.jpg'
+HEADER_COLOR = 'white'
+COLOR_SCHEME_CSS = 'darkly.css'
 
+# Custom Footer
+FOOTER_INCLUDE = 'customfooter.html'
+IGNORE_FILES = [FOOTER_INCLUDE]
+EXTRA_TEMPLATES_PATHS = [os.path.dirname(__file__)]
 
 # Fixed menu items
 MENUITEMS = (
-    ('Blog', 'https://robotics-grimoire.github.io'),
     ('About', '/pages/about.html'),
-    ('References', '/pages/references.html'),
+    ('Archive', '/archives.html'),
+    ('Tags', '/tags.html'),
+    ('Links', '/pages/links.html'),
+    ('Reference', '/pages/references.html'),
 )
 
 # Dynamic menu items
@@ -71,8 +70,9 @@ LINKS = (
 )
 
 # Social widgets
+SHOW_SOCIAL_ON_INDEX_PAGE_HEADER = True
 SOCIAL = (
-    ('LinkedIn', 'https://www.linkedin.com/jhill515'),
+    ('LinkedIn', 'https://www.linkedin.com/in/jhill515'),
     ('Stack Overflow', 'https://stackoverflow.com/users/story/2370362'),
 )
 
