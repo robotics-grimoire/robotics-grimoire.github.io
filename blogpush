@@ -1,6 +1,14 @@
 #!/bin/bash
 
+# Get comment string
 str="$*"
 
+# Get rid of checkpoint directories
+find . -type d -name ".ipynb_checkpoints" | xargs rm -rf
+
+# Build site and commit to master
 pelican content -o output -s publishconf.py
 ghp-import -m "$str" --no-jekyll -b master output
+
+# Publish the damn thing!
+git push origin master
