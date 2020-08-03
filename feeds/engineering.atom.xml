@@ -1171,7 +1171,8 @@ h6:hover .anchor-link {
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h4 id="Listing-1---Example-of-a-Stateful-Program"&gt;&lt;em&gt;Listing 1 - Example of a Stateful Program&lt;/em&gt;&lt;a class="anchor-link" href="#Listing-1---Example-of-a-Stateful-Program"&gt;&amp;#182;&lt;/a&gt;&lt;/h4&gt;&lt;script src="https://gist.github.com/jhill515/3df708cdd0aa3cb75c51c78c06ced0ff.js"&gt;&lt;/script&gt;
+&lt;h4 id="Listing-1---Example-of-a-Stateful-Program"&gt;&lt;em&gt;Listing 1 - Example of a Stateful Program&lt;/em&gt;&lt;a class="anchor-link" href="#Listing-1---Example-of-a-Stateful-Program"&gt;&amp;#182;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;[gist:id=3df708cdd0aa3cb75c51c78c06ced0ff.js]&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1319,7 +1320,131 @@ h6:hover .anchor-link {
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h4 id="Listing-2---State-Machine-Pattern"&gt;&lt;em&gt;Listing 2 - State Machine Pattern&lt;/em&gt;&lt;a class="anchor-link" href="#Listing-2---State-Machine-Pattern"&gt;&amp;#182;&lt;/a&gt;&lt;/h4&gt;&lt;script src="https://gist.github.com/jhill515/de3271d3a1e9f2c5a7cb9b9f834c3391.js"&gt;&lt;/script&gt;
+&lt;h4 id="Listing-2---State-Machine-Pattern"&gt;&lt;em&gt;Listing 2 - State Machine Pattern&lt;/em&gt;&lt;a class="anchor-link" href="#Listing-2---State-Machine-Pattern"&gt;&amp;#182;&lt;/a&gt;&lt;/h4&gt;&lt;div class="gist"&gt;
+    &lt;script src='https://gist.github.com/de3271d3a1e9f2c5a7cb9b9f834c3391.js'&gt;&lt;/script&gt;
+    &lt;noscript&gt;
+        &lt;pre&gt;&lt;code&gt;#include "MyInputApi.h"
+#include "MyOutputApi.h"
+#include "MyOverseerApi.h"
+#include "MyTransformApi.h"
+
+#include &lt;thread&gt;
+#include &lt;chrono&gt;
+#include &lt;map&gt;
+
+class EventCollector
+{
+  public:
+  enum class EventType : uint8_t
+  {
+    Start,
+    InterfacesFailed,
+    InterfacesClosed,
+    DataAvail,
+    DataMissingSignal,
+    ShutdownSignal,
+    GeneralFault,
+    Exit
+  };
+  
+  EventCollector&amp; getInstance()
+  {
+    static EventCollector instance;
+    return instance;
+  }
+  
+  void setEvent(const EventType&amp; evt)
+  {
+    // Event precidence logic
+    currentEvt = evt;
+  }
+  
+  EventType getEvent() { return currentEvt; }
+  
+  private:
+  EventType currentEvt{Start};
+  EventCollector() = default;
+};
+
+class StateHandler
+{
+  public:
+  void handleState() noexcept = 0;
+};
+
+class InitHandler final : public StateHandler
+{
+  public:
+  explicit InitHandler(MyInputApi&amp; inputApi, MyOutputApi&amp; outputApi);
+  void handleState() noexcept override; // Register I/O; set event to InterfacesOpen or InterfacesFailed
+};
+
+class FaultHandler final : public StateHandler
+{
+  public:
+  explicit FaultHandler();
+  void handleState() noexcept override; // Failure ops; set event to Exit
+};
+
+class ShutdownHandler final : public StateHandler
+{
+  public:
+  explicit ShutdownHandler(MyInputApi&amp; inputApi, MyOutputApi&amp; outputApi);
+  void handleState() noexcept override; // De-register I/O; set event to InterfacesFailed or Exit
+};
+
+class NominalHandler final : public StateHandler
+{
+  public:
+  explicit InitHandler(MyInputApi&amp; inputApi, MyOutputApi&amp; outputApi);
+  void handleState() noexcept override; // Process new data; do not set event or set to InterfacesFailed
+};
+
+class DegradedHandler final : public StateHandler
+{
+  public:
+  explicit InitHandler(MyOutputApi&amp; outputApi);
+  void handleState() noexcept override; // Process old data; do not set event or set to InterfacesFailed
+};
+
+//--- Main -------------------------------------------------------------------------------------------------------------
+
+int main(int, char**)
+{
+  EventCollector&amp; evtCollector = EventCollector::getInstance();
+  MyInputApi myInput; // Set this up on a thread to listen for inputs
+  MyOverseerApi myOverseerApi; // set this up on a thread to listen for commands
+  MyOutputApi myOutput;
+  EventCollector::EventType currentEvent{EventCollector::EventType::Start};
+  
+  std::map&lt;EventCollector::EventType, std::unique_ptr&lt;StateHandler&gt;&gt; myStateTable
+  {
+    {EventCollector::EventType::Start,             std::make_unique&lt;InitHandler&gt;(myInput,myOutput)},
+    {EventCollector::EventType::InterfacesFailed,  std::make_unique&lt;FaultHandler&gt;()},
+    {EventCollector::EventType::DataAvail,         std::make_unique&lt;InitHandler&gt;(myInput,myOutput)},
+    {EventCollector::EventType::DataMissingSignal, std::make_unique&lt;InitHandler&gt;(myInput,myOutput)},
+    {EventCollector::EventType::ShutdownSignal,    std::make_unique&lt;InitHandler&gt;(myInput,myOutput)},
+    {EventCollector::EventType::GeneralFault,      std::make_unique&lt;FaultHandler&gt;()}
+  };
+  
+  while((currentEvent = evtCollector.getEvent()) != EventCollector::EventType::Exit)
+  {
+    if(myStateTable.find(currentEvent) != myStateTable.end())
+    {
+      myStateTable[currentEvent].handleState();
+    }
+    else
+    {
+      // Unmapped state
+      myStateTable[EventCollector::EventType::GeneralFault].handleState();
+    }
+  }
+    
+  return 0;
+}&lt;/code&gt;&lt;/pre&gt;
+    &lt;/noscript&gt;
+&lt;/div&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
