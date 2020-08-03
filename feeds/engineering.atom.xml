@@ -1171,7 +1171,58 @@ h6:hover .anchor-link {
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h4 id="Listing-1---Example-of-a-Stateful-Program"&gt;&lt;em&gt;Listing 1 - Example of a Stateful Program&lt;/em&gt;&lt;a class="anchor-link" href="#Listing-1---Example-of-a-Stateful-Program"&gt;&amp;#182;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;[gist:id=3df708cdd0aa3cb75c51c78c06ced0ff.js]&lt;/p&gt;
+&lt;h4 id="Listing-1---Example-of-a-Stateful-Program"&gt;&lt;em&gt;Listing 1 - Example of a Stateful Program&lt;/em&gt;&lt;a class="anchor-link" href="#Listing-1---Example-of-a-Stateful-Program"&gt;&amp;#182;&lt;/a&gt;&lt;/h4&gt;&lt;div class="gist"&gt;
+    &lt;script src='https://gist.github.com/3df708cdd0aa3cb75c51c78c06ced0ff.js'&gt;&lt;/script&gt;
+    &lt;noscript&gt;
+        &lt;pre&gt;&lt;code&gt;#include "MyInputApi.h"
+#include "MyOutputApi.h"
+#include "MyOverseerApi.h"
+#include "MyTransformApi.h"
+
+#include &lt;iostream&gt;
+#include &lt;cstdlib&gt;
+
+int main(int, char** argv)
+{
+  MyTransformApi hiddenFunc;
+  srand(atoi(argv[1]));
+  try
+  {
+    // Initialize the interfaces
+    MyInputApi inputIf;
+    inputIf.connect();
+
+    MyOutputApi outputIf;
+    outputIf.connect();
+
+    std::string buf;
+    while(MyOverseerApi::getInstance().keepRunning())
+    {
+      // buf.clear();
+      MyTransformApi::OutData output;
+      auto status = inputIf.getNext(buf);
+
+      if(status)
+      {
+        // Got new data
+        output = hiddenFunc.magic(buf);
+      }
+      else
+      {
+        // Data wasn't available
+        output = hiddenFunc.extrapolateFromLast();
+      }
+      outputIf.send(output);
+    }
+  }
+  catch(...)
+  {
+    std::cout &lt;&lt; "Caught an exception, so aborting!" &lt;&lt; std::endl;
+  }
+  return 0;
+}&lt;/code&gt;&lt;/pre&gt;
+    &lt;/noscript&gt;
+&lt;/div&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
