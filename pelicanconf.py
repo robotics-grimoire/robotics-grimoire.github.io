@@ -38,6 +38,7 @@ PLUGINS = [
     'render_math',
     'related_posts',
     'ipynb.markup',
+    'pelican_gist',
 ]
 
 ### THEME SETUP ###
